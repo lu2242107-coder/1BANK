@@ -12,16 +12,17 @@
     /* 容器設定 */
     #app-container { width: 100%; max-width: 480px; height: 100%; background: #f8f9fa; display: flex; flex-direction: column; position: relative; box-shadow: 0 0 20px rgba(0,0,0,0.2); }
     
-    /* ================= 登入畫面 ================= */
-    #login-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #d31027 0%, #ea384d 100%); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100; color: white; }
-    .login-box { background: white; padding: 30px; border-radius: 20px; width: 85%; box-shadow: 0 10px 25px rgba(0,0,0,0.2); text-align: center; color: #333; }
+    /* ================= 登入彈出視窗 (Modal) ================= */
+    #login-modal { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); z-index: 999; justify-content: center; align-items: center; }
+    .login-box { background: white; padding: 30px; border-radius: 20px; width: 85%; box-shadow: 0 10px 25px rgba(0,0,0,0.3); text-align: center; color: #333; animation: popIn 0.3s ease-out; }
+    @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
     .login-box h2 { margin-bottom: 20px; color: #d31027; font-weight: 900; }
     .login-input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; font-family: 'Microsoft JhengHei'; }
-    .login-btn { width: 100%; background: #d31027; color: white; border: none; padding: 12px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.2s; }
-    .login-btn:active { transform: scale(0.98); }
+    .login-btn { width: 100%; background: #d31027; color: white; border: none; padding: 12px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.2s; margin-bottom: 10px; }
+    .cancel-btn { width: 100%; background: #999; color: white; border: none; padding: 12px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; }
     
     /* ================= 主程式畫面 ================= */
-    #main-app { display: none; flex-direction: column; height: 100%; width: 100%; }
+    #main-app { display: flex; flex-direction: column; height: 100%; width: 100%; }
     
     /* 頂部 Header */
     #header { background: linear-gradient(135deg, #d31027 0%, #ea384d 100%); color: white; padding: 20px 15px 10px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); z-index: 10; }
@@ -56,8 +57,9 @@
     
     /* 一鍵生成按鈕 */
     .line-btn { width: 100%; background: #00c300; color: white; border: none; padding: 12px; border-radius: 10px; font-size: 15px; font-weight: bold; margin-top: 10px; cursor: pointer; box-shadow: 0 4px 10px rgba(0, 195, 0, 0.3); display: flex; justify-content: center; align-items: center; gap: 8px; }
+    .line-btn:active { transform: scale(0.98); }
     
-    /* ================= 其他頁面設計 (圖文包庫 / 儀表板 / 設定) ================= */
+    /* ================= 其他頁面設計 ================= */
     .sub-page-container { padding: 20px; flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
     .sub-page-title { font-size: 20px; font-weight: bold; color: #d31027; margin-bottom: 15px; border-bottom: 2px solid #d31027; padding-bottom: 10px; }
     
@@ -76,19 +78,19 @@
 
 <div id="app-container">
 
-    <!-- ================= 登入畫面 ================= -->
-    <div id="login-screen">
-        <div style="font-size: 40px; margin-bottom: 10px;">🚀</div>
-        <h1 style="margin-bottom: 30px; letter-spacing: 2px;">戰神大滿貫</h1>
+    <!-- ================= 管理員登入視窗 ================= -->
+    <div id="login-modal">
         <div class="login-box">
-            <h2>系統登入</h2>
+            <h2>管理員設定登入</h2>
+            <p style="font-size:13px; color:#666; margin-bottom:15px;">進入個人設定需驗證權限</p>
             <input type="text" id="username" class="login-input" placeholder="請輸入帳號 (預設: TONY)">
             <input type="password" id="password" class="login-input" placeholder="請輸入密碼 (預設: 661001)">
             <button class="login-btn" onclick="checkLogin()">登 入</button>
+            <button class="cancel-btn" onclick="cancelLogin()">取 消</button>
         </div>
     </div>
 
-    <!-- ================= 主程式畫面 ================= -->
+    <!-- ================= 主程式 ================= -->
     <div id="main-app">
         <!-- Header -->
         <div id="header">
@@ -104,95 +106,519 @@
                 <button class="nav-btn" onclick="switchTab('page2', this)">2.資深理專</button>
                 <button class="nav-btn" onclick="switchTab('page3', this)">3.銀行櫃檯</button>
                 <button class="nav-btn" onclick="switchTab('page4', this)">4.房信貸業務</button>
-                <!-- 將「新進理專」更改為「菁英理專」 -->
                 <button class="nav-btn" onclick="switchTab('page5', this)">5.菁英理專</button>
                 <button class="nav-btn" onclick="switchTab('page6', this)">6.銀行警衛</button>
             </div>
 
             <!-- Content Area -->
             <div id="content-area">
-                <!-- PAGE 1: 經理人 -->
+                
+                <!-- ================= PAGE 1: 經理人 ================= -->
                 <div id="page1" class="page active">
                     <div class="card"><div class="emoji-corner">🎩</div>
                         <div class="card-title"><span class="card-tag">維度 1</span>企業大老闆</div>
                         <div class="layer"><strong>1. 破冰故事：</strong>「董仔，最近看您擴廠，公司資金流水一定很大吧！」</div>
                         <div class="layer"><strong>2. 點出盲點：</strong>「幾千萬閒錢放一般帳戶沒利息，等於每天看著利潤被通膨吃掉！」</div>
-                        <div class="layer"><strong>3. 話術腳本：</strong>「錢放哪最賺您最懂！來我們這存台幣直接給1.8%，美金更爽拿6%還送萬元海港城私聚！這筆穩賺的生意我立刻派專人為您辦！」</div>
+                        <div class="layer"><strong>3. 黃金3句話：</strong>「錢放哪最賺您最懂！來遠銀存台幣直接給1.8%，美金爽拿6%還送萬元海港城私聚！這筆穩賺的生意我立刻派專人為您辦！」</div>
                         <div class="layer"><strong>4. 引導解方：</strong>中小企業戶4千萬內申辦新優利台幣定存1.8%；老闆個人資金推八星MGM享美金6%與1萬元漢來海港城私聚。</div>
                         <button class="line-btn" onclick="generateLinePack(this)">📲 一鍵生成 LINE 圖文包</button>
                     </div>
+                    <div class="card"><div class="emoji-corner">👔</div>
+                        <div class="card-title"><span class="card-tag">維度 2</span>家族接班人</div>
+                        <div class="layer"><strong>1. 破冰故事：</strong>「少東，接班後要扛家族企業的重擔，資金調度更重要了。」</div>
+                        <div class="layer"><strong>2. 點出盲點：</strong>「上一代的傳統理財觀念太保守，資金放著沒活化就是虧損。」</div>
+                        <div class="layer"><strong>3. 黃金3句話：</strong>「家族資產來我這，全家綁定拿十樂限量餐盤與高球傘！大筆美金做晶優利9個月3.88%穩收息！由我親自為您的家族財富把關！」</div>
+                        <div class="layer"><strong>4. 引導解方：</strong>利用十樂FUN輕鬆家戶迎新禮（五星主戶贈高球傘、完成加碼贈餐盤）破冰，大額資金轉入晶優利美金3.88%。</div>
+                        <button class="line-btn" onclick="generateLinePack(this)">📲 一鍵生成 LINE 圖文包</button>
+                    </div>
                     <div class="card"><div class="emoji-corner">🤝</div>
-                        <div class="card-title"><span class="card-tag">維度 2</span>同業高資產VIP</div>
+                        <div class="card-title"><span class="card-tag">維度 3</span>同業高資產VIP</div>
                         <div class="layer"><strong>1. 破冰故事：</strong>「X董，您在外商銀行的服務還滿意嗎？」</div>
-                        <div class="layer"><strong>2. 點出盲點：</strong>「外商舊戶都沒好康，門檻又高又囉嗦，您的身價不該被這樣對待！」</div>
-                        <div class="layer"><strong>3. 話術腳本：</strong>「來遠銀新舊戶同享美金6%高利！不用綁東綁西，推薦朋友再拿頂級私宴！我是分行經理，您的VIP權益我親自顧！」</div>
-                        <div class="layer"><strong>4. 引導解方：</strong>對標同業弱點，強推八星MGM專案，強調遠銀勝出點：新舊戶同享3個月美金6%，大額美金也可做晶優利9個月3.88%。</div>
+                        <div class="layer"><strong>2. 點出盲點：</strong>「外商舊戶都沒好康，凱基/匯豐門檻又高又要綁商品，您的身價不該被這樣對待！」</div>
+                        <div class="layer"><strong>3. 黃金3句話：</strong>「來遠銀新舊戶同享美金6%高利！不用綁東綁西，推薦朋友再拿頂級私宴！我是分行經理，您的VIP權益我親自顧！」</div>
+                        <div class="layer"><strong>4. 引導解方：</strong>對標同業弱點，強推八星MGM專案，強調遠銀免Bundle且新舊戶同享美金6%。</div>
+                        <button class="line-btn" onclick="generateLinePack(this)">📲 一鍵生成 LINE 圖文包</button>
+                    </div>
+                    <div class="card"><div class="emoji-corner">👴</div>
+                        <div class="card-title"><span class="card-tag">維度 4</span>退休富豪</div>
+                        <div class="layer"><strong>1. 破冰故事：</strong>「老董，退休生活都在打高爾夫，日子過得很愜意喔！」</div>
+                        <div class="layer"><strong>2. 點出盲點：</strong>「但您的退休金如果只靠傳統定存，根本追不上現在的物價上漲。」</div>
+                        <div class="layer"><strong>3. 黃金3句話：</strong>「您的零用錢放活利旺，美金最高給您2.4%隨時可以領！大筆退休金做八星美金6%！讓錢幫您賺養老金，我幫您處理到好！」</div>
+                        <div class="layer"><strong>4. 引導解方：</strong>流動資金登錄新活利旺最高享美金2.4%，大額資金引導參與八星MGM享6%。</div>
+                        <button class="line-btn" onclick="generateLinePack(this)">📲 一鍵生成 LINE 圖文包</button>
+                    </div>
+                    <div class="card"><div class="emoji-corner">🚢</div>
+                        <div class="card-title"><span class="card-tag">維度 5</span>跨國貿易商</div>
+                        <div class="layer"><strong>1. 破冰故事：</strong>「這季出口訂單接不完，海外匯回的貨款很驚人吧！」</div>
+                        <div class="layer"><strong>2. 點出盲點：</strong>「大筆美金貨款卡在一般帳戶沒生息，每天都在白白流失利潤。」</div>
+                        <div class="layer"><strong>3. 黃金3句話：</strong>「大筆美金轉來遠銀，9個月穩拿3.88%完全無上限！日常流水綁定活存也有2.4%隨時調度！這套企業資金活化方案我馬上替您啟動！」</div>
+                        <div class="layer"><strong>4. 引導解方：</strong>大額資金入晶優利美元9個月3.88%，流動資金登錄新活利旺享美元最高2.4%。</div>
+                        <button class="line-btn" onclick="generateLinePack(this)">📲 一鍵生成 LINE 圖文包</button>
+                    </div>
+                    <div class="card"><div class="emoji-corner">💻</div>
+                        <div class="card-title"><span class="card-tag">維度 6</span>科技業高管</div>
+                        <div class="layer"><strong>1. 破冰故事：</strong>「副總，今年公司配發的股票與分紅大豐收吧！」</div>
+                        <div class="layer"><strong>2. 點出盲點：</strong>「高管忙碌沒空盯盤，分紅放活存只會被通膨吃光，券商手續費又貴！」</div>
+                        <div class="layer"><strong>3. 黃金3句話：</strong>「股票賺的錢要鎖住！台幣放這拿1.8%定存！順便幫您開遠銀證券戶，手續費2.8折再送1888元！一站搞定您的分紅與投資！」</div>
+                        <div class="layer"><strong>4. 引導解方：</strong>分紅配置新優利台幣定存1.8%，並申辦銀證雙開拿1888元電子交易折抵金與2.8折優惠。</div>
+                        <button class="line-btn" onclick="generateLinePack(this)">📲 一鍵生成 LINE 圖文包</button>
+                    </div>
+                    <div class="card"><div class="emoji-corner">🩺</div>
+                        <div class="card-title"><span class="card-tag">維度 7</span>知名診所院長</div>
+                        <div class="layer"><strong>1. 破冰故事：</strong>「院長看診辛苦了，診所最近的自費客很多，收入很可觀吧！」</div>
+                        <div class="layer"><strong>2. 點出盲點：</strong>「現金滿手卻沒空理財，放在一般戶頭等於把錢鎖在保險箱生灰塵。」</div>
+                        <div class="layer"><strong>3. 黃金3句話：</strong>「現金不要死存！台幣直接做1.8%定存，介紹醫師同行來再請您吃萬元海港城！讓我用專業幫您把關財富！」</div>
+                        <div class="layer"><strong>4. 引導解方：</strong>新資金投入新優利台幣定存1.8%；透過八星MGM推薦同行達標拿萬元私聚與6%美金。</div>
+                        <button class="line-btn" onclick="generateLinePack(this)">📲 一鍵生成 LINE 圖文包</button>
+                    </div>
+                    <div class="card"><div class="emoji-corner">🏢</div>
+                        <div class="card-title"><span class="card-tag">維度 8</span>房地產大亨</div>
+                        <div class="layer"><strong>1. 破冰故事：</strong>「總裁，最近那塊精華地段的案子順利嗎？」</div>
+                        <div class="layer"><strong>2. 點出盲點：</strong>「賣地換回的大筆現金，在找下個標的前空轉太可惜！」</div>
+                        <div class="layer"><strong>3. 黃金3句話：</strong>「這筆百萬美金閒置期交給我！3個月拿6%高利，還能跟您的建商朋友一起享用萬元海港城私宴！邊賺利息邊聚餐談大生意！」</div>
+                        <div class="layer"><strong>4. 引導解方：</strong>無縫接軌八星MGM專案，推薦新戶達1億可享萬元私聚；零散資金放新優利台幣1.8%。</div>
+                        <button class="line-btn" onclick="generateLinePack(this)">📲 一鍵生成 LINE 圖文包</button>
+                    </div>
+                    <div class="card"><div class="emoji-corner">📈</div>
+                        <div class="card-title"><span class="card-tag">維度 9</span>投資公司老闆</div>
+                        <div class="layer"><strong>1. 破冰故事：</strong>「老闆近期台股操作很犀利喔，獲利滿滿！」</div>
+                        <div class="layer"><strong>2. 點出盲點：</strong>「每天進出頻繁，券商手續費和資金停泊的活存利息都被同業佔便宜了。」</div>
+                        <div class="layer"><strong>3. 黃金3句話：</strong>「來遠銀活存最高給您1.4%！下單手續費2.8折再送1888元折抵！這來回的龐大利差，我這個經理直接幫您賺回來！」</div>
+                        <div class="layer"><strong>4. 引導解方：</strong>透過銀證雙開享1888元折抵金與2.8折，資金停泊登錄新活利旺台幣最高1.4%。</div>
+                        <button class="line-btn" onclick="generateLinePack(this)">📲 一鍵生成 LINE 圖文包</button>
+                    </div>
+                    <div class="card"><div class="emoji-corner">🍷</div>
+                        <div class="card-title"><span class="card-tag">維度 10</span>頂級紅酒會會長</div>
+                        <div class="layer"><strong>1. 破冰故事：</strong>「會長，近期有沒有辦高檔的品酒會？」</div>
+                        <div class="layer"><strong>2. 點出盲點：</strong>「人脈就是錢脈，您聚集了這麼多大老闆，沒變現太可惜了。」</div>
+                        <div class="layer"><strong>3. 黃金3句話：</strong>「您揪團來遠銀開戶！會員AUM達標，我直接送您9人美饌餐券辦聚餐，再搭配晶優利3.88%穩收息！您就是最大贏家！」</div>
+                        <div class="layer"><strong>4. 引導解方：</strong>強推十樂FUN輕鬆MGM專案，揪新戶AUM達3000萬享約當9人美饌(價值9000元)，資金配置晶優利美元3.88%。</div>
                         <button class="line-btn" onclick="generateLinePack(this)">📲 一鍵生成 LINE 圖文包</button>
                     </div>
                 </div>
 
-                <!-- PAGE 2: 資深理專 -->
+                <!-- ================= PAGE 2: 資深理專 ================= -->
                 <div id="page2" class="page">
                     <div class="card"><div class="emoji-corner">💵</div>
-                        <div class="card-title"><span class="card-tag">維度 1</span>滿手美金逐利客</div>
+                        <div class="card-title"><span class="card-tag">維度 1</span>滿手美元定存客</div>
                         <div class="layer"><strong>1. 破冰故事：</strong>「大姐，您別家銀行的美金定存快到期了吧？」</div>
-                        <div class="layer"><strong>2. 點出盲點：</strong>「舊戶續存利息都被打折，您的資金不該被這樣冷落！」</div>
-                        <div class="layer"><strong>3. 話術腳本：</strong>「來遠銀，新舊戶一視同仁給您美金6%！您揪好姊妹一起存，我再請你們吃萬元海港城私宴！名額秒殺，馬上幫您搶！」</div>
+                        <div class="layer"><strong>2. 點出盲點：</strong>「外商舊戶續存利息都被打折，您的資金不該被這樣冷落！」</div>
+                        <div class="layer"><strong>3. 黃金3句話：</strong>「來遠銀，新舊戶一視同仁給您美金6%！您揪好姊妹一起存，我再請你們吃萬元海港城私宴！名額秒殺，馬上幫您搶！」</div>
                         <div class="layer"><strong>4. 引導解方：</strong>霸氣切入八星MGM專案，推薦既有戶與新戶同享3個月美金6%，並達成宴客條件。</div>
                         <button class="line-btn" onclick="generateLinePack(this)">📲 一鍵生成 LINE 圖文包</button>
                     </div>
+                    <div class="card"><div class="emoji-corner">📊</div>
+                        <div class="card-title"><span class="card-tag">維度 2</span>台股當沖老手</div>
+                        <div class="layer"><strong>1. 破冰故事：</strong>「哥，最近台股震盪大，當沖手續費繳了不少給券商吧？」</div>
+                        <div class="layer"><strong>2. 點出盲點：</strong>「每天進出，手續費早就把你的獲利吃掉一大半了！」</div>
+                        <div class="layer"><strong>3. 黃金3句話：</strong>「換到遠銀下單！手續費直接殺到2.8折，還送你1888元折抵金！省下來的錢就是多賺的，我現在就發QR code給你開！」</div>
+                        <div class="layer"><strong>4. 引導解方：</strong>透過專屬QR code推薦客戶線上開立亞證，享電子交易手續費1888元折抵金及2.8折優惠。</div>
+                        <button class="line-btn" onclick="generateLinePack(this)">📲 一鍵生成 LINE 圖文包</button>
+                    </div>
+                    <div class="card"><div class="emoji-corner">👩‍👦</div>
+                        <div class="card-title"><span class="card-tag">維度 3</span>家庭財務長(媽媽)</div>
+                        <div class="layer"><strong>1. 破冰故事：</strong>「林太太，小孩學費跟家裡開銷都您在精打細算，辛苦了！」</div>
+                        <div class="layer"><strong>2. 點出盲點：</strong>「把錢分散在不同銀行，根本享受不到VIP的集中火力回饋！」</div>
+                        <div class="layer"><strong>3. 黃金3句話：</strong>「把全家帳戶整合過來！拿限量餐盤跟傘，活存最高1.4%！幫小孩存股定期定額只要1塊錢！全家一起賺最聰明！」</div>
+                        <div class="layer"><strong>4. 引導解方：</strong>推動十樂家戶迎新禮綁定拿贈品，搭配新活利旺台幣1.4%，與銀證雙開定期定額每筆1元優惠。</div>
+                        <button class="line-btn" onclick="generateLinePack(this)">📲 一鍵生成 LINE 圖文包</button>
+                    </div>
+                    <div class="card"><div class="emoji-corner">📉</div>
+                        <div class="card-title"><span class="card-tag">維度 4</span>保守收息族</div>
+                        <div class="layer"><strong>1. 破冰故事：</strong>「大哥，投資最怕賠本，您說是吧？」</div>
+                        <div class="layer"><strong>2. 點出盲點：</strong>「放活存被通膨吃，買高風險商品又睡不著覺。」</div>
+                        <div class="layer"><strong>3. 黃金3句話：</strong>「最安心的保本保息在這裡！台幣直接存12個月穩拿1.8%！利息穩穩入袋，讓您晚上睡得好！」</div>
+                        <div class="layer"><strong>4. 引導解方：</strong>強推新優利台幣專案，單筆5萬起即可享1.8%固定年利率。</div>
+                        <button class="line-btn" onclick="generateLinePack(this)">📲 一鍵生成 LINE 圖文包</button>
+                    </div>
+                    <div class="card"><div class="emoji-corner">🗣️</div>
+                        <div class="card-title"><span class="card-tag">維度 5</span>意見領袖(團購主)</div>
+                        <div class="layer"><strong>1. 破冰故事：</strong>「姐，您在群組呼風喚雨，帶大家買好物，影響力真大！」</div>
+                        <div class="layer"><strong>2. 點出盲點：</strong>「幫別人賣東西賺微薄利潤，不如揪團賺集團的豪華大餐。」</div>
+                        <div class="layer"><strong>3. 黃金3句話：</strong>「揪群友來開戶存錢！AUM滿額直接送您價值9千的9人美饌餐券！您動動手指就是最大贏家！」</div>
+                        <div class="layer"><strong>4. 引導解方：</strong>十樂FUN輕鬆MGM專案，次月新戶AUM達3000萬享集團餐飲回饋(約當9人美饌)。</div>
+                        <button class="line-btn" onclick="generateLinePack(this)">📲 一鍵生成 LINE 圖文包</button>
+                    </div>
+                    <div class="card"><div class="emoji-corner">✈️</div>
+                        <div class="card-title"><span class="card-tag">維度 6</span>海歸退休族</div>
+                        <div class="layer"><strong>1. 破冰故事：</strong>「伯父，從國外回來台灣生活還習慣嗎？」</div>
+                        <div class="layer"><strong>2. 點出盲點：</strong>「美金匯回台灣如果沒找對地方存，利差真的會虧很大。」</div>
+                        <div class="layer"><strong>3. 黃金3句話：</strong>「您的美金放遠銀最尊榮！9個月給您3.88%！大筆資金完全無上限，我親自幫您處理到好！」</div>
+                        <div class="layer"><strong>4. 引導解方：</strong>晶優利美金定存專案，無最高申辦金額上限，享9個月3.88%。</div>
+                        <button class="line-btn" onclick="generateLinePack(this)">📲 一鍵生成 LINE 圖文包</button>
+                    </div>
+                    <div class="card"><div class="emoji-corner">🔄</div>
+                        <div class="card-title"><span class="card-tag">維度 7</span>定存解約客</div>
+                        <div class="layer"><strong>1. 破冰故事：</strong>「這筆定存提早解約，是有其他緊急用途嗎？」</div>
+                        <div class="layer"><strong>2. 點出盲點：</strong>「資金出現空窗期，就算只放活存，一天沒高利息都是損失。」</div>
+                        <div class="layer"><strong>3. 黃金3句話：</strong>「資金等動用的這段時間，放活利旺！美金最高2.4%、台幣1.4%！按個登錄馬上生息，絕不讓您吃虧！」</div>
+                        <div class="layer"><strong>4. 引導解方：</strong>引導掃碼登錄新活利旺專屬網頁，享有活存加碼利率。</div>
+                        <button class="line-btn" onclick="generateLinePack(this)">📲 一鍵生成 LINE 圖文包</button>
+                    </div>
+                    <div class="card"><div class="emoji-corner">🤬</div>
+                        <div class="card-title"><span class="card-tag">維度 8</span>外商受氣客</div>
+                        <div class="layer"><strong>1. 破冰故事：</strong>「是不是又被外商理專推銷不想買的複雜商品了？」</div>
+                        <div class="layer"><strong>2. 點出盲點：</strong>「外商高利定存都要綁定搭售(Bundle)高風險資產，根本是拿您的錢開玩笑。」</div>
+                        <div class="layer"><strong>3. 黃金3句話：</strong>「來遠銀免綁商品！純美金定存直接給6%！我們只給您最純粹的高利，絕不強迫推銷！」</div>
+                        <div class="layer"><strong>4. 引導解方：</strong>用同業比較表擊破，凱基需Bundle，遠銀八星MGM直接享3個月6%純高利。</div>
+                        <button class="line-btn" onclick="generateLinePack(this)">📲 一鍵生成 LINE 圖文包</button>
+                    </div>
+                    <div class="card"><div class="emoji-corner">💰</div>
+                        <div class="card-title"><span class="card-tag">維度 9</span>大額台幣停泊客</div>
+                        <div class="layer"><strong>1. 破冰故事：</strong>「大哥，這幾千萬現金在等什麼好的投資標的？」</div>
+                        <div class="layer"><strong>2. 點出盲點：</strong>「資金太龐大，一般銀行不收大額高利定存，錢都被卡死了。」</div>
+                        <div class="layer"><strong>3. 黃金3句話：</strong>「中小企業戶台幣4000萬內，遠銀全收！直接給1.8%！利息絕對讓您滿意，資金調度最靈活！」</div>
+                        <div class="layer"><strong>4. 引導解方：</strong>新優利台幣專案，針對中小企業戶4000萬以內限額提供1.8%高息。</div>
+                        <button class="line-btn" onclick="generateLinePack(this)">📲 一鍵生成 LINE 圖文包</button>
+                    </div>
+                    <div class="card"><div class="emoji-corner">🎁</div>
+                        <div class="card-title"><span class="card-tag">維度 10</span>愛拿贈品的VIP</div>
+                        <div class="layer"><strong>1. 破冰故事：</strong>「姐，我知道您最注重生活品質跟獨特體驗！」</div>
+                        <div class="layer"><strong>2. 點出盲點：</strong>「別家送的禮券太普通，根本配不上您的身分。」</div>
+                        <div class="layer"><strong>3. 黃金3句話：</strong>「這次我們送您吃漢來海港城私聚！再拿十樂限量餐盤組！只有頂級客戶才有，馬上幫您留名額！」</div>
+                        <div class="layer"><strong>4. 引導解方：</strong>結合八星MGM私宴(達標送萬元海港城)與十樂FUN輕鬆加碼任務贈餐盤組。</div>
+                        <button class="line-btn" onclick="generateLinePack(this)">📲 一鍵生成 LINE 圖文包</button>
+                    </div>
                 </div>
 
-                <!-- PAGE 3: 銀行櫃檯 -->
+                <!-- ================= PAGE 3: 銀行櫃檯 ================= -->
                 <div id="page3" class="page">
                     <div class="card"><div class="emoji-corner">👵</div>
                         <div class="card-title"><span class="card-tag">維度 1</span>臨櫃定存續單阿姨</div>
                         <div class="layer"><strong>1. 破冰故事：</strong>「阿姨，您今天這筆定存剛好到期喔！」</div>
                         <div class="layer"><strong>2. 點出盲點：</strong>「現在舊專案利息不高，您直接續存就虧大了！」</div>
-                        <div class="layer"><strong>3. 話術腳本：</strong>「我幫您轉到最新的台幣專案，利息高達1.8%！只要5萬就能辦，我現在一分鐘幫您搞定，讓您多賺買菜錢！」</div>
-                        <div class="layer"><strong>4. 引導解方：</strong>櫃檯直接將舊資金或新資金引導至新優利台幣專案，單筆最低5萬享1.8%。</div>
+                        <div class="layer"><strong>3. 黃金3句話：</strong>「我幫您轉到最新的台幣專案，利息高達1.8%！只要5萬就能辦，我現在一分鐘幫您搞定，讓您多賺買菜錢！」</div>
+                        <div class="layer"><strong>4. 引導解方：</strong>櫃檯直接將舊資金或新資金引導至新優利台幣專案，單筆最低5萬享12個月1.8%。</div>
+                        <button class="line-btn" onclick="generateLinePack(this)">📲 一鍵生成 LINE 圖文包</button>
+                    </div>
+                    <div class="card"><div class="emoji-corner">💼</div>
+                        <div class="card-title"><span class="card-tag">維度 2</span>跑腿的企業會計</div>
+                        <div class="layer"><strong>1. 破冰故事：</strong>「陳小姐，今天一樣來幫公司匯款嗎？辛苦了！」</div>
+                        <div class="layer"><strong>2. 點出盲點：</strong>「我看公司帳戶放了不少活存，這樣老闆每年少賺很多利息耶！」</div>
+                        <div class="layer"><strong>3. 黃金3句話：</strong>「回去跟老闆報備！我們中小企業台幣定存有1.8%！4千萬內都可以存，幫公司賺錢，老闆一定給妳加薪！」</div>
+                        <div class="layer"><strong>4. 引導解方：</strong>推廣新優利專案中「中小企業戶僅限臨櫃辦理」的特點，鎖定4000萬內資金享1.8%。</div>
+                        <button class="line-btn" onclick="generateLinePack(this)">📲 一鍵生成 LINE 圖文包</button>
+                    </div>
+                    <div class="card"><div class="emoji-corner">📱</div>
+                        <div class="card-title"><span class="card-tag">維度 3</span>開戶新鮮人</div>
+                        <div class="layer"><strong>1. 破冰故事：</strong>「同學，第一次來我們銀行開戶嗎？」</div>
+                        <div class="layer"><strong>2. 點出盲點：</strong>「只開銀行戶不夠用啦，以後買股票還要再跑一趟！」</div>
+                        <div class="layer"><strong>3. 黃金3句話：</strong>「掃這個QR Code一次開好銀行跟證券！台幣活存最高1.4%，買股票還送1888元折抵！年輕人理財神器一次到位！」</div>
+                        <div class="layer"><strong>4. 引導解方：</strong>櫃員出示QR Code引導線上銀證雙開拿1888元，並協助登錄新活利旺台幣1.4%。</div>
+                        <button class="line-btn" onclick="generateLinePack(this)">📲 一鍵生成 LINE 圖文包</button>
+                    </div>
+                    <div class="card"><div class="emoji-corner">💵</div>
+                        <div class="card-title"><span class="card-tag">維度 4</span>外幣匯款客(留學生家長)</div>
+                        <div class="layer"><strong>1. 破冰故事：</strong>「今天換這麼多美金，是要匯給小孩念書還是投資？」</div>
+                        <div class="layer"><strong>2. 點出盲點：</strong>「美金放著沒動，匯差利差兩頭空，太浪費了。」</div>
+                        <div class="layer"><strong>3. 黃金3句話：</strong>「這筆美金放9個月定存，我們給您3.88%！1萬美金就能辦，超級划算，幫小孩多賺生活費！」</div>
+                        <div class="layer"><strong>4. 引導解方：</strong>臨櫃推廣晶優利美元定存，單筆最低1萬美元享9個月3.88%。</div>
+                        <button class="line-btn" onclick="generateLinePack(this)">📲 一鍵生成 LINE 圖文包</button>
+                    </div>
+                    <div class="card"><div class="emoji-corner">💳</div>
+                        <div class="card-title"><span class="card-tag">維度 5</span>繳卡費的小資族</div>
+                        <div class="layer"><strong>1. 破冰故事：</strong>「繳完卡費，戶頭剩下的零錢也別浪費喔！」</div>
+                        <div class="layer"><strong>2. 點出盲點：</strong>「小錢放活存，利息低到無感，等於沒生息。」</div>
+                        <div class="layer"><strong>3. 黃金3句話：</strong>「手機拿出來掃一下！登記這個活動，活存利息加碼到1.4%！順手幫自己加薪，積少成多！」</div>
+                        <div class="layer"><strong>4. 引導解方：</strong>提供專屬Recommender網址，引導客戶線上登錄新活利旺專案享台幣1.4%。</div>
+                        <button class="line-btn" onclick="generateLinePack(this)">📲 一鍵生成 LINE 圖文包</button>
+                    </div>
+                    <div class="card"><div class="emoji-corner">👶</div>
+                        <div class="card-title"><span class="card-tag">維度 6</span>帶小孩的媽媽</div>
+                        <div class="layer"><strong>1. 破冰故事：</strong>「弟弟好可愛！媽媽有幫他存未來的教育基金嗎？」</div>
+                        <div class="layer"><strong>2. 點出盲點：</strong>「傳統兒童帳戶沒優惠，定存又追不上通膨。」</div>
+                        <div class="layer"><strong>3. 黃金3句話：</strong>「全家一起開戶！送您折疊傘，還能幫小孩設定定期定額買股，手續費只要1塊錢！從小開始滾雪球！」</div>
+                        <div class="layer"><strong>4. 引導解方：</strong>推廣十樂家庭會員綁定送傘，並結合銀證雙開定期定額每筆1元優惠(至2028年底)。</div>
+                        <button class="line-btn" onclick="generateLinePack(this)">📲 一鍵生成 LINE 圖文包</button>
+                    </div>
+                    <div class="card"><div class="emoji-corner">👴</div>
+                        <div class="card-title"><span class="card-tag">維度 7</span>補摺的退休阿伯</div>
+                        <div class="layer"><strong>1. 破冰故事：</strong>「阿伯，簿子印出來，發現利息怎麼那麼少對吧！」</div>
+                        <div class="layer"><strong>2. 點出盲點：</strong>「退休金死守一般活存，越存越薄，根本不夠用。」</div>
+                        <div class="layer"><strong>3. 黃金3句話：</strong>「阿伯！你轉5萬過來這個專案，一年就有1.8%利息！穩穩賺最安心，我現在幫你辦！」</div>
+                        <div class="layer"><strong>4. 引導解方：</strong>引導阿伯將帳戶資金轉入新優利台幣12個月定存1.8%。</div>
+                        <button class="line-btn" onclick="generateLinePack(this)">📲 一鍵生成 LINE 圖文包</button>
+                    </div>
+                    <div class="card"><div class="emoji-corner">📄</div>
+                        <div class="card-title"><span class="card-tag">維度 8</span>解約儲蓄險客</div>
+                        <div class="layer"><strong>1. 破冰故事：</strong>「這筆保單到期拿回一大筆現金喔，恭喜！」</div>
+                        <div class="layer"><strong>2. 點出盲點：</strong>「突然滿手現金，放著沒利息很虧，又不敢亂投資。」</div>
+                        <div class="layer"><strong>3. 黃金3句話：</strong>「現金先別急著花，放美金9個月穩拿3.88%！利息夠您出國玩一趟了，安全又高息！」</div>
+                        <div class="layer"><strong>4. 引導解方：</strong>大筆解約資金轉入晶優利美元9個月3.88%專案。</div>
+                        <button class="line-btn" onclick="generateLinePack(this)">📲 一鍵生成 LINE 圖文包</button>
+                    </div>
+                    <div class="card"><div class="emoji-corner">💎</div>
+                        <div class="card-title"><span class="card-tag">維度 9</span>大額提款VIP</div>
+                        <div class="layer"><strong>1. 破冰故事：</strong>「董仔，提這麼多現金要去投資其他地方喔？」</div>
+                        <div class="layer"><strong>2. 點出盲點：</strong>「別家銀行的優惠絕對沒我們殺，提走太可惜了。」</div>
+                        <div class="layer"><strong>3. 黃金3句話：</strong>「錢留著！推薦朋友來遠銀，您直接拿美金3個月6%高息，再吃萬元海港城！這好康外面找不到！」</div>
+                        <div class="layer"><strong>4. 引導解方：</strong>行內大戶提款時轉介八星MGM活動，留住資金並享受6%高息與私聚。</div>
+                        <button class="line-btn" onclick="generateLinePack(this)">📲 一鍵生成 LINE 圖文包</button>
+                    </div>
+                    <div class="card"><div class="emoji-corner">🌧️</div>
+                        <div class="card-title"><span class="card-tag">維度 10</span>躲雨的過路客</div>
+                        <div class="layer"><strong>1. 破冰故事：</strong>「外面雨好大，進來喝杯水休息一下吧！」</div>
+                        <div class="layer"><strong>2. 點出盲點：</strong>「反正也是在空等，時間白白浪費了。」</div>
+                        <div class="layer"><strong>3. 黃金3句話：</strong>「趁躲雨拿手機掃碼開戶！送您一把高質感折疊傘直接撐回家，活存還有1.4%！一舉兩得！」</div>
+                        <div class="layer"><strong>4. 引導解方：</strong>推廣十樂FUN輕鬆新家戶綁定送折疊傘，並順便登錄新活利旺1.4%。</div>
                         <button class="line-btn" onclick="generateLinePack(this)">📲 一鍵生成 LINE 圖文包</button>
                     </div>
                 </div>
 
-                <!-- PAGE 4: 房信貸業務 -->
+                <!-- ================= PAGE 4: 房信貸業務 ================= -->
                 <div id="page4" class="page">
                     <div class="card"><div class="emoji-corner">🏭</div>
                         <div class="card-title"><span class="card-tag">維度 1</span>企業週轉金老闆</div>
                         <div class="layer"><strong>1. 破冰故事：</strong>「頭家，這次貸款撥下來，資金後盾就穩了！」</div>
                         <div class="layer"><strong>2. 點出盲點：</strong>「但備用金放在一般帳戶沒利息，等於每天被貸款利息成本吃掉利潤！」</div>
-                        <div class="layer"><strong>3. 話術腳本：</strong>「這筆閒錢放活利旺，台幣最高1.4%隨時能動用！等於幫公司貸款利息打折！動動手指掃碼，我幫您爭取！」</div>
+                        <div class="layer"><strong>3. 黃金3句話：</strong>「這筆閒錢放活利旺，台幣最高1.4%隨時能動用！等於幫公司貸款利息打折！動動手指掃碼，我幫您爭取！」</div>
                         <div class="layer"><strong>4. 引導解方：</strong>發送專屬 Recommender QR Code 讓老闆登錄新活利旺專案。閒置資金轉中小企業台幣1.8%定存。</div>
                         <button class="line-btn" onclick="generateLinePack(this)">📲 一鍵生成 LINE 圖文包</button>
                     </div>
-                </div>
-
-                <!-- PAGE 5: 菁英理專 -->
-                <div id="page5" class="page">
-                    <div class="card"><div class="emoji-corner">📱</div>
-                        <div class="card-title"><span class="card-tag">維度 1</span>愛用LINE的群組客</div>
-                        <div class="layer"><strong>1. 破冰故事：</strong>「哥，我看您常在群組揪團，現在有個銀行好康超適合您！」</div>
-                        <div class="layer"><strong>2. 點出盲點：</strong>「平常團購只能省小錢，這次揪團我們直接送您去吃饗賓大餐！」</div>
-                        <div class="layer"><strong>3. 話術腳本：</strong>「不管懂不懂投資，這連結發群組！朋友開戶你拿9人份美饌大餐！活存還有1.4%！動動手指白嫖銀行優惠！」</div>
-                        <div class="layer"><strong>4. 引導解方：</strong>利用活利旺Recommender參數讓客戶分享，結合十樂MGM專案新戶達標拿3000-9000元饗賓餐券。</div>
+                    <div class="card"><div class="emoji-corner">🏠</div>
+                        <div class="card-title"><span class="card-tag">維度 2</span>剛撥款房貸客</div>
+                        <div class="layer"><strong>1. 破冰故事：</strong>「恭喜交屋！裝潢款準備好了嗎？」</div>
+                        <div class="layer"><strong>2. 點出盲點：</strong>「裝潢尾款分批付，閒置在帳戶裡沒生息很浪費。」</div>
+                        <div class="layer"><strong>3. 黃金3句話：</strong>「裝潢款放這拿1.4%活存！邊生息邊付工程款，完全不吃虧，等於銀行幫您出油漆錢！」</div>
+                        <div class="layer"><strong>4. 引導解方：</strong>資金登錄新活利旺台幣活存加碼至1.4%。</div>
+                        <button class="line-btn" onclick="generateLinePack(this)">📲 一鍵生成 LINE 圖文包</button>
+                    </div>
+                    <div class="card"><div class="emoji-corner">🔄</div>
+                        <div class="card-title"><span class="card-tag">維度 3</span>信貸整合客</div>
+                        <div class="layer"><strong>1. 破冰故事：</strong>「這次幫您代償，每個月省下不少月付金喔！」</div>
+                        <div class="layer"><strong>2. 點出盲點：</strong>「省下的錢如果不強迫理財，很快又會不知不覺花掉。」</div>
+                        <div class="layer"><strong>3. 黃金3句話：</strong>「省下的錢拿來存股！現在開證券戶送1888元折抵，定期定額只要1塊錢，重新養大你的財富！」</div>
+                        <div class="layer"><strong>4. 引導解方：</strong>引導辦理銀證雙開享1888元折抵金與定期定額每筆1元至2028年底。</div>
+                        <button class="line-btn" onclick="generateLinePack(this)">📲 一鍵生成 LINE 圖文包</button>
+                    </div>
+                    <div class="card"><div class="emoji-corner">💰</div>
+                        <div class="card-title"><span class="card-tag">維度 4</span>賣房滿手現金客</div>
+                        <div class="layer"><strong>1. 破冰故事：</strong>「大哥，房子高點賣出，賺翻了吧！」</div>
+                        <div class="layer"><strong>2. 點出盲點：</strong>「幾千萬現金放活存，每天都在被通膨怪獸吃掉。」</div>
+                        <div class="layer"><strong>3. 黃金3句話：</strong>「這筆鉅款交給我！美金定存給您3.88%！再請您去吃萬元海港城慶祝！保本又高息！」</div>
+                        <div class="layer"><strong>4. 引導解方：</strong>大額資金推八星MGM(達標吃私聚)與晶優利美元9個月3.88%。</div>
+                        <button class="line-btn" onclick="generateLinePack(this)">📲 一鍵生成 LINE 圖文包</button>
+                    </div>
+                    <div class="card"><div class="emoji-corner">🚗</div>
+                        <div class="card-title"><span class="card-tag">維度 5</span>汽車原車融資客</div>
+                        <div class="layer"><strong>1. 破冰故事：</strong>「車貸撥款了，最近資金調度有比較鬆了吧！」</div>
+                        <div class="layer"><strong>2. 點出盲點：</strong>「小額資金更需要高活存來補貼利息，放一般帳戶太可惜。」</div>
+                        <div class="layer"><strong>3. 黃金3句話：</strong>「撥下來的錢先放活存拿1.4%加碼！積少成多，用銀行的錢補貼你的車貸利息！」</div>
+                        <div class="layer"><strong>4. 引導解方：</strong>登錄新活利旺活存專案，享台幣最高1.4%。</div>
+                        <button class="line-btn" onclick="generateLinePack(this)">📲 一鍵生成 LINE 圖文包</button>
+                    </div>
+                    <div class="card"><div class="emoji-corner">🔑</div>
+                        <div class="card-title"><span class="card-tag">維度 6</span>換屋過渡期客戶</div>
+                        <div class="layer"><strong>1. 破冰故事：</strong>「先賣後買，這段空窗期手上的資金滿充裕的！」</div>
+                        <div class="layer"><strong>2. 點出盲點：</strong>「買新房的錢不能被死死綁在定存，需要極高的流動性。」</div>
+                        <div class="layer"><strong>3. 黃金3句話：</strong>「錢放活利旺，美金高達2.4%！隨時可以提款買房，一天的高利息都不漏接！」</div>
+                        <div class="layer"><strong>4. 引導解方：</strong>新資金線上登錄新活利旺，享美金活存最高2.4%。</div>
+                        <button class="line-btn" onclick="generateLinePack(this)">📲 一鍵生成 LINE 圖文包</button>
+                    </div>
+                    <div class="card"><div class="emoji-corner">👩‍💼</div>
+                        <div class="card-title"><span class="card-tag">維度 7</span>管錢的老闆娘</div>
+                        <div class="layer"><strong>1. 破冰故事：</strong>「董娘，公司資金調度都是您在操心啊！」</div>
+                        <div class="layer"><strong>2. 點出盲點：</strong>「老公的錢要管，但自己的私房錢更要用力賺。」</div>
+                        <div class="layer"><strong>3. 黃金3句話：</strong>「公司的錢放台幣1.8%定存！您的私房錢放美金3.88%！兩手賺，穩穩的雙贏！」</div>
+                        <div class="layer"><strong>4. 引導解方：</strong>公司戶辦理中小企業台幣1.8%定存，個人戶搭配晶優利美金3.88%。</div>
+                        <button class="line-btn" onclick="generateLinePack(this)">📲 一鍵生成 LINE 圖文包</button>
+                    </div>
+                    <div class="card"><div class="emoji-corner">🏗️</div>
+                        <div class="card-title"><span class="card-tag">維度 8</span>建商/營造老闆</div>
+                        <div class="layer"><strong>1. 破冰故事：</strong>「董仔，土建融撥款了，大工程要啟動囉！」</div>
+                        <div class="layer"><strong>2. 點出盲點：</strong>「工程款是分期支付的，中間大量閒置資金放著太浪費。」</div>
+                        <div class="layer"><strong>3. 黃金3句話：</strong>「閒錢停泊遠銀拿1.4%活存！推薦股東一起來，再拿萬元大餐！邊蓋房子邊賺利息！」</div>
+                        <div class="layer"><strong>4. 引導解方：</strong>資金登錄新活利旺享台幣1.4%，並推廣八星MGM專案賺取海港城宴席。</div>
+                        <button class="line-btn" onclick="generateLinePack(this)">📲 一鍵生成 LINE 圖文包</button>
+                    </div>
+                    <div class="card"><div class="emoji-corner">👨‍👩‍👧</div>
+                        <div class="card-title"><span class="card-tag">維度 9</span>小家庭房貸客</div>
+                        <div class="layer"><strong>1. 破冰故事：</strong>「成家買房不容易，房貸我幫您爭取最優的利率了！」</div>
+                        <div class="layer"><strong>2. 點出盲點：</strong>「全家帳戶散落各處，沒有集中火力產生綜效。」</div>
+                        <div class="layer"><strong>3. 黃金3句話：</strong>「全家來開戶拿十樂餐盤！以後買股票手續費2.8折，順便幫小孩存未來的買房基金！」</div>
+                        <div class="layer"><strong>4. 引導解方：</strong>十樂FUN輕鬆送餐盤與銀證雙開2.8折優惠。</div>
+                        <button class="line-btn" onclick="generateLinePack(this)">📲 一鍵生成 LINE 圖文包</button>
+                    </div>
+                    <div class="card"><div class="emoji-corner">📈</div>
+                        <div class="card-title"><span class="card-tag">維度 10</span>房地產投資客</div>
+                        <div class="layer"><strong>1. 破冰故事：</strong>「這間收租投報率算下來很不錯喔！」</div>
+                        <div class="layer"><strong>2. 點出盲點：</strong>「每個月的租金收入放活存，資金效益太低了。」</div>
+                        <div class="layer"><strong>3. 黃金3句話：</strong>「租金轉過來做定期定額買股，手續費只要1塊錢！讓錢滾錢的速度翻倍！」</div>
+                        <div class="layer"><strong>4. 引導解方：</strong>銀證雙開專案，定期定額每筆1元優惠至2028年底。</div>
                         <button class="line-btn" onclick="generateLinePack(this)">📲 一鍵生成 LINE 圖文包</button>
                     </div>
                 </div>
 
-                <!-- PAGE 6: 銀行警衛 -->
+                <!-- ================= PAGE 5: 菁英理專 ================= -->
+                <div id="page5" class="page">
+                    <div class="card"><div class="emoji-corner">📱</div>
+                        <div class="card-title"><span class="card-tag">維度 1</span>愛用LINE的群組客</div>
+                        <div class="layer"><strong>1. 破冰故事：</strong>「哥，我看您常在群組揪團，現在有個銀行好康超適合您發到群組！」</div>
+                        <div class="layer"><strong>2. 點出盲點：</strong>「平常揪團只能省小錢，這次我們直接送您去吃饗賓大餐！」</div>
+                        <div class="layer"><strong>3. 黃金3句話：</strong>「不管懂不懂投資，這連結發群組！朋友開戶你拿9人份美饌大餐！活存還有1.4%！動動手指白嫖銀行優惠！」</div>
+                        <div class="layer"><strong>4. 引導解方：</strong>利用活利旺Recommender參數讓客戶分享，結合十樂MGM專案新戶達標拿3000-9000元饗賓餐券。</div>
+                        <button class="line-btn" onclick="generateLinePack(this)">📲 一鍵生成 LINE 圖文包</button>
+                    </div>
+                    <div class="card"><div class="emoji-corner">💻</div>
+                        <div class="card-title"><span class="card-tag">維度 2</span>數位帳戶愛好者</div>
+                        <div class="layer"><strong>1. 破冰故事：</strong>「是不是還在各大銀行到處找高利活存？」</div>
+                        <div class="layer"><strong>2. 點出盲點：</strong>「別家數位帳戶額度低，而且只限新戶才有優惠。」</div>
+                        <div class="layer"><strong>3. 黃金3句話：</strong>「遠銀直接給你美金活存最高2.4%！不管新舊戶，網頁登錄馬上生效，無腦賺高息！」</div>
+                        <div class="layer"><strong>4. 引導解方：</strong>發送新活利旺專屬網頁，引導線上登錄享美元最高2.4%。</div>
+                        <button class="line-btn" onclick="generateLinePack(this)">📲 一鍵生成 LINE 圖文包</button>
+                    </div>
+                    <div class="card"><div class="emoji-corner">📈</div>
+                        <div class="card-title"><span class="card-tag">維度 3</span>存股小資族</div>
+                        <div class="layer"><strong>1. 破冰故事：</strong>「每個月發薪水都有乖乖存股嗎？」</div>
+                        <div class="layer"><strong>2. 點出盲點：</strong>「還在付券商低消20元手續費？長期下來成本虧爆了！」</div>
+                        <div class="layer"><strong>3. 黃金3句話：</strong>「來開銀證雙開！定期定額手續費只要1塊錢，一路優惠到2028年！幫你省下手續費多買幾股！」</div>
+                        <div class="layer"><strong>4. 引導解方：</strong>推廣銀證雙開定期定額每筆1元(不限金額)優惠。</div>
+                        <button class="line-btn" onclick="generateLinePack(this)">📲 一鍵生成 LINE 圖文包</button>
+                    </div>
+                    <div class="card"><div class="emoji-corner">🎮</div>
+                        <div class="card-title"><span class="card-tag">維度 4</span>科技業年輕工程師</div>
+                        <div class="layer"><strong>1. 破冰故事：</strong>「學長，剛領完一筆大分紅，準備買什麼好料？」</div>
+                        <div class="layer"><strong>2. 點出盲點：</strong>「放著不理財，購買力只會下降，沒時間看盤更是致命傷。」</div>
+                        <div class="layer"><strong>3. 黃金3句話：</strong>「分紅直接丟美金9個月定存拿3.88%！比美股還穩，不用盯盤！我傳連結給你馬上辦！」</div>
+                        <div class="layer"><strong>4. 引導解方：</strong>大筆資金轉入晶優利美金9個月3.88%定存。</div>
+                        <button class="line-btn" onclick="generateLinePack(this)">📲 一鍵生成 LINE 圖文包</button>
+                    </div>
+                    <div class="card"><div class="emoji-corner">🎓</div>
+                        <div class="card-title"><span class="card-tag">維度 5</span>求第一桶金大學生</div>
+                        <div class="layer"><strong>1. 破冰故事：</strong>「打工辛苦存的錢，有好好規劃嗎？」</div>
+                        <div class="layer"><strong>2. 點出盲點：</strong>「高利定存門檻通常太高，年輕人根本存不到那個數字。」</div>
+                        <div class="layer"><strong>3. 黃金3句話：</strong>「只要5萬塊就能享台幣1.8%定存！你的第一桶金從遠銀開始，穩穩保本保息！」</div>
+                        <div class="layer"><strong>4. 引導解方：</strong>新優利台幣專案單筆最低5萬即可申辦，享12個月1.8%。</div>
+                        <button class="line-btn" onclick="generateLinePack(this)">📲 一鍵生成 LINE 圖文包</button>
+                    </div>
+                    <div class="card"><div class="emoji-corner">🎁</div>
+                        <div class="card-title"><span class="card-tag">維度 6</span>活動贈品狂熱者</div>
+                        <div class="layer"><strong>1. 破冰故事：</strong>「姐，這把限量高球傘超有質感的對吧！」</div>
+                        <div class="layer"><strong>2. 點出盲點：</strong>「別家銀行要買高額基金才送禮物，門檻太高了。」</div>
+                        <div class="layer"><strong>3. 黃金3句話：</strong>「全家來開戶綁定LINE，免費送折疊傘跟限量餐盤！不拿白不拿，趕快揪家人一起來！」</div>
+                        <div class="layer"><strong>4. 引導解方：</strong>十樂FUN輕鬆家庭戶迎新禮（綁定送傘、加碼任務送餐盤）。</div>
+                        <button class="line-btn" onclick="generateLinePack(this)">📲 一鍵生成 LINE 圖文包</button>
+                    </div>
+                    <div class="card"><div class="emoji-corner">🚀</div>
+                        <div class="card-title"><span class="card-tag">維度 7</span>投資新手小白</div>
+                        <div class="layer"><strong>1. 破冰故事：</strong>「想投資又怕被市場當韭菜割嗎？」</div>
+                        <div class="layer"><strong>2. 點出盲點：</strong>「理專推的複雜商品看不懂，風險太高睡不著覺。」</div>
+                        <div class="layer"><strong>3. 黃金3句話：</strong>「最白話的保本專案！台幣定存1.8%！閉著眼睛存都不會虧，最適合你起步！」</div>
+                        <div class="layer"><strong>4. 引導解方：</strong>強推最簡單易懂的新優利台幣定存1.8%。</div>
+                        <button class="line-btn" onclick="generateLinePack(this)">📲 一鍵生成 LINE 圖文包</button>
+                    </div>
+                    <div class="card"><div class="emoji-corner">💸</div>
+                        <div class="card-title"><span class="card-tag">維度 8</span>常換匯的網拍賣家</div>
+                        <div class="layer"><strong>1. 破冰故事：</strong>「最近批貨換美金的頻率很高喔，生意不錯！」</div>
+                        <div class="layer"><strong>2. 點出盲點：</strong>「流動資金放美金活存利息太低，都被銀行賺走了。」</div>
+                        <div class="layer"><strong>3. 黃金3句話：</strong>「批貨週轉金放這！美金活存給你最高2.4%！邊進貨邊賺利息，降低你的匯率成本！」</div>
+                        <div class="layer"><strong>4. 引導解方：</strong>登錄新活利旺享美金活存最高2.4%。</div>
+                        <button class="line-btn" onclick="generateLinePack(this)">📲 一鍵生成 LINE 圖文包</button>
+                    </div>
+                    <div class="card"><div class="emoji-corner">券</div>
+                        <div class="card-title"><span class="card-tag">維度 9</span>貪手續費折扣客</div>
+                        <div class="layer"><strong>1. 破冰故事：</strong>「你現在買股票手續費是拿幾折？」</div>
+                        <div class="layer"><strong>2. 點出盲點：</strong>「小資族券商折讓太少，交易成本過高吃掉利潤。」</div>
+                        <div class="layer"><strong>3. 黃金3句話：</strong>「免談判直接給你2.8折！開戶再送你1888元折抵金，等於前幾筆交易免手續費！現賺一筆！」</div>
+                        <div class="layer"><strong>4. 引導解方：</strong>透過線上開立銀證雙開，享電子交易手續費1888元折抵(次月底前有效)與2.8折優惠。</div>
+                        <button class="line-btn" onclick="generateLinePack(this)">📲 一鍵生成 LINE 圖文包</button>
+                    </div>
+                    <div class="card"><div class="emoji-corner">👫</div>
+                        <div class="card-title"><span class="card-tag">維度 10</span>頂客族夫妻(DINK)</div>
+                        <div class="layer"><strong>1. 破冰故事：</strong>「兩人世界最自在，提早財富自由最重要！」</div>
+                        <div class="layer"><strong>2. 點出盲點：</strong>「沒善用雙人資源擴大收益，少賺很多好康。」</div>
+                        <div class="layer"><strong>3. 黃金3句話：</strong>「一人推薦一人！拿3個月美金6%，再一起去吃3千元海港城大餐度週末！雙重享受！」</div>
+                        <div class="layer"><strong>4. 引導解方：</strong>八星MGM專案，被推薦人達標享3000元私聚，雙人同享美金3個月6%。</div>
+                        <button class="line-btn" onclick="generateLinePack(this)">📲 一鍵生成 LINE 圖文包</button>
+                    </div>
+                </div>
+
+                <!-- ================= PAGE 6: 銀行警衛 ================= -->
                 <div id="page6" class="page">
                     <div class="card"><div class="emoji-corner">⏱️</div>
                         <div class="card-title"><span class="card-tag">維度 1</span>抽號碼牌等候客</div>
                         <div class="layer"><strong>1. 破冰故事：</strong>「大哥，今天人比較多，等叫號無聊嗎？」</div>
                         <div class="layer"><strong>2. 點出盲點：</strong>「看您滑手機也是滑，不如趁現在順手幫自己賺點錢！」</div>
-                        <div class="layer"><strong>3. 話術腳本：</strong>「掃這張QR Code！活存最高有2.4%，還送折疊傘！這麼好康，我叫裡面的專員馬上出來幫您辦！」</div>
+                        <div class="layer"><strong>3. 黃金3句話：</strong>「掃這張QR Code！活存最高有2.4%，還送折疊傘！這麼好康，我叫裡面的專員馬上出來幫您辦！」</div>
                         <div class="layer"><strong>4. 引導解方：</strong>遞出新活利旺QR Code引導線上綁定，並通報理專接手處理十樂家戶禮送傘。</div>
+                        <button class="line-btn" onclick="generateLinePack(this)">📲 一鍵生成 LINE 圖文包</button>
+                    </div>
+                    <div class="card"><div class="emoji-corner">🏧</div>
+                        <div class="card-title"><span class="card-tag">維度 2</span>ATM領錢民眾</div>
+                        <div class="layer"><strong>1. 破冰故事：</strong>「來領錢喔，順便教你一個賺錢的方法啦！」</div>
+                        <div class="layer"><strong>2. 點出盲點：</strong>「大家都不知道我們銀行裡面現在有超高利的專案。」</div>
+                        <div class="layer"><strong>3. 黃金3句話：</strong>「台幣定存現在有1.8%喔！只要5萬就能存，我幫你抽張號碼牌，進去問問絕對不虧！」</div>
+                        <div class="layer"><strong>4. 引導解方：</strong>轉介臨櫃申辦新優利台幣12個月定存1.8%。</div>
+                        <button class="line-btn" onclick="generateLinePack(this)">📲 一鍵生成 LINE 圖文包</button>
+                    </div>
+                    <div class="card"><div class="emoji-corner">🏃</div>
+                        <div class="card-title"><span class="card-tag">維度 3</span>趕時間的上班族</div>
+                        <div class="layer"><strong>1. 破冰故事：</strong>「看您很趕，是要辦什麼業務？」</div>
+                        <div class="layer"><strong>2. 點出盲點：</strong>「排隊浪費上班時間，可能還會被老闆罵。」</div>
+                        <div class="layer"><strong>3. 黃金3句話：</strong>「不用排隊！掃這張QR Code自己線上開證券戶，馬上拿1888元抵用金！省時又賺錢！」</div>
+                        <div class="layer"><strong>4. 引導解方：</strong>發放銀證雙開線上開戶專屬連結QR Code。</div>
+                        <button class="line-btn" onclick="generateLinePack(this)">📲 一鍵生成 LINE 圖文包</button>
+                    </div>
+                    <div class="card"><div class="emoji-corner">🚗</div>
+                        <div class="card-title"><span class="card-tag">維度 4</span>門口停車的VIP</div>
+                        <div class="layer"><strong>1. 破冰故事：</strong>「董仔早！經理已經在裡面等您了！」</div>
+                        <div class="layer"><strong>2. 點出盲點：</strong>「大客戶需要尊榮感預熱，直接推銷會反感。」</div>
+                        <div class="layer"><strong>3. 黃金3句話：</strong>「經理說今天特別幫您留了萬元海港城聚餐的名額！您快進去聽聽看，別被搶光了！」</div>
+                        <div class="layer"><strong>4. 引導解方：</strong>警衛破冰預熱，交由經理收割八星MGM專案。</div>
+                        <button class="line-btn" onclick="generateLinePack(this)">📲 一鍵生成 LINE 圖文包</button>
+                    </div>
+                    <div class="card"><div class="emoji-corner">👶</div>
+                        <div class="card-title"><span class="card-tag">維度 5</span>推嬰兒車的家長</div>
+                        <div class="layer"><strong>1. 破冰故事：</strong>「弟弟好乖！媽媽今天來辦事啊？」</div>
+                        <div class="layer"><strong>2. 點出盲點：</strong>「帶小孩不方便久候，需要最快的好處。」</div>
+                        <div class="layer"><strong>3. 黃金3句話：</strong>「媽媽妳掃這個加LINE，馬上送妳一把折疊傘！以後買股票手續費只要1塊錢，幫弟弟存錢最快！」</div>
+                        <div class="layer"><strong>4. 引導解方：</strong>推廣十樂家庭綁定送傘與銀證雙開1元手續費。</div>
+                        <button class="line-btn" onclick="generateLinePack(this)">📲 一鍵生成 LINE 圖文包</button>
+                    </div>
+                    <div class="card"><div class="emoji-corner">👀</div>
+                        <div class="card-title"><span class="card-tag">維度 6</span>看海報的過路客</div>
+                        <div class="layer"><strong>1. 破冰故事：</strong>「這張海報是我們現在最紅的活動啦！」</div>
+                        <div class="layer"><strong>2. 點出盲點：</strong>「看半天不敢進去問，錯失高利息。」</div>
+                        <div class="layer"><strong>3. 黃金3句話：</strong>「美金存9個月就有3.88%！超級高！我請專員倒杯茶給您詳細解說，聽聽不用錢！」</div>
+                        <div class="layer"><strong>4. 引導解方：</strong>主動迎賓，轉介晶優利美元3.88%專案。</div>
+                        <button class="line-btn" onclick="generateLinePack(this)">📲 一鍵生成 LINE 圖文包</button>
+                    </div>
+                    <div class="card"><div class="emoji-corner">❓</div>
+                        <div class="card-title"><span class="card-tag">維度 7</span>迷路問路的民眾</div>
+                        <div class="layer"><strong>1. 破冰故事：</strong>「直走左轉就到了！不用客氣！」</div>
+                        <div class="layer"><strong>2. 點出盲點：</strong>「隨機接觸也是商機，發張傳單不如發優惠。」</div>
+                        <div class="layer"><strong>3. 黃金3句話：</strong>「相逢就是有緣，這張小卡送你，掃碼登錄活存加碼到1.4%，當作給你的走路工！」</div>
+                        <div class="layer"><strong>4. 引導解方：</strong>遞交新活利旺推廣小卡QR Code。</div>
+                        <button class="line-btn" onclick="generateLinePack(this)">📲 一鍵生成 LINE 圖文包</button>
+                    </div>
+                    <div class="card"><div class="emoji-corner">🌧️</div>
+                        <div class="card-title"><span class="card-tag">維度 8</span>躲雨聊天的鄰居</div>
+                        <div class="layer"><strong>1. 破冰故事：</strong>「雨下真大，來拿張面紙擦擦！」</div>
+                        <div class="layer"><strong>2. 點出盲點：</strong>「厝邊頭尾最容易推廣，但缺少臨門一腳的贈品。」</div>
+                        <div class="layer"><strong>3. 黃金3句話：</strong>「阿姨，叫妳全家來開戶啦！拿限量餐盤回去裝水果，很漂亮喔，送完就沒了！」</div>
+                        <div class="layer"><strong>4. 引導解方：</strong>推十樂FUN輕鬆完成加碼任務送餐盤組。</div>
+                        <button class="line-btn" onclick="generateLinePack(this)">📲 一鍵生成 LINE 圖文包</button>
+                    </div>
+                    <div class="card"><div class="emoji-corner">👴</div>
+                        <div class="card-title"><span class="card-tag">維度 9</span>每天經過的長輩</div>
+                        <div class="layer"><strong>1. 破冰故事：</strong>「阿伯今天又去公園運動喔，精神真好！」</div>
+                        <div class="layer"><strong>2. 點出盲點：</strong>「長輩信任感夠，只差一個震撼的數字打動他。」</div>
+                        <div class="layer"><strong>3. 黃金3句話：</strong>「阿伯你看這個！美金放3個月就給6%！比你錢放衣櫃好啦，進來吹冷氣聽聽看！」</div>
+                        <div class="layer"><strong>4. 引導解方：</strong>預熱八星MGM享美元6%，轉交理專接手。</div>
+                        <button class="line-btn" onclick="generateLinePack(this)">📲 一鍵生成 LINE 圖文包</button>
+                    </div>
+                    <div class="card"><div class="emoji-corner">😡</div>
+                        <div class="card-title"><span class="card-tag">維度 10</span>抱怨利息低的阿姨</div>
+                        <div class="layer"><strong>1. 破冰故事：</strong>「阿姨麥生氣，現在利息本來就很薄。」</div>
+                        <div class="layer"><strong>2. 點出盲點：</strong>「客戶不知道銀行內有隱藏版的高利專案可轉。」</div>
+                        <div class="layer"><strong>3. 黃金3句話：</strong>「不要存一般活存啦！轉去台幣定存有1.8%！我請最厲害的理專出來教妳怎麼存最賺！」</div>
+                        <div class="layer"><strong>4. 引導解方：</strong>安撫情緒並成功轉介新優利台幣定存專案1.8%。</div>
                         <button class="line-btn" onclick="generateLinePack(this)">📲 一鍵生成 LINE 圖文包</button>
                     </div>
                 </div>
                 
-                <!-- 底部留白 -->
-                <div style="height: 20px;"></div>
+                <!-- 底部留白以防內容被導覽列遮擋 -->
+                <div style="height: 30px;"></div>
             </div>
         </div>
 
@@ -225,7 +651,7 @@
             <div class="sub-page-container">
                 <div class="sub-page-title">⚙️ 個人設定</div>
                 <div style="background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
-                    <p style="font-weight: bold; margin-bottom: 10px;">目前登入帳號：<span style="color: #d31027;">TONY</span></p>
+                    <p style="font-weight: bold; margin-bottom: 10px;">目前管理員帳號：<span style="color: #d31027;">TONY</span></p>
                     <hr style="border: none; border-top: 1px solid #eee; margin: 15px 0;">
                     <button onclick="logout()" style="width: 100%; background: #555; color: white; border: none; padding: 12px; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer;">登出系統</button>
                 </div>
@@ -251,29 +677,38 @@
 </div>
 
 <script>
+    // 登入狀態管理
+    let isLoggedIn = false;
+
     // ================= 1. 登入系統邏輯 =================
     function checkLogin() {
         const user = document.getElementById('username').value.trim();
         const pass = document.getElementById('password').value.trim();
         
-        // 驗證預設帳號密碼
         if (user === 'TONY' && pass === '661001') {
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('main-app').style.display = 'flex';
+            isLoggedIn = true;
+            document.getElementById('login-modal').style.display = 'none';
+            // 登入成功後，切換到設定頁面
+            executeTabSwitch('settings-view', document.getElementById('nav-settings'));
         } else {
             alert('帳號或密碼錯誤！\n\n預設帳號：TONY\n預設密碼：661001');
         }
     }
 
+    function cancelLogin() {
+        // 取消登入，隱藏 modal，不改變頁面
+        document.getElementById('login-modal').style.display = 'none';
+        // 清空輸入
+        document.getElementById('username').value = '';
+        document.getElementById('password').value = '';
+    }
+
     function logout() {
-        if(confirm('確定要登出系統嗎？')) {
-            // 清空輸入框
+        if(confirm('確定要登出管理員設定嗎？')) {
+            isLoggedIn = false;
             document.getElementById('username').value = '';
             document.getElementById('password').value = '';
-            // 切換畫面
-            document.getElementById('main-app').style.display = 'none';
-            document.getElementById('login-screen').style.display = 'flex';
-            // 回到首頁狀態
+            // 退回首頁
             switchBottomTab('home-view', document.getElementById('nav-home'));
         }
     }
@@ -290,16 +725,23 @@
         document.getElementById('content-area').scrollTop = 0;
     }
 
-    // ================= 3. 底部選單切換 =================
+    // ================= 3. 底部選單切換 (攔截設定頁面) =================
     function switchBottomTab(viewId, navElement) {
-        // 隱藏所有底部視圖
+        // 如果點擊的是「個人設定」且尚未登入，則彈出登入視窗，攔截切換
+        if (viewId === 'settings-view' && !isLoggedIn) {
+            document.getElementById('login-modal').style.display = 'flex';
+            return;
+        }
+        // 否則正常執行切換
+        executeTabSwitch(viewId, navElement);
+    }
+
+    function executeTabSwitch(viewId, navElement) {
         document.querySelectorAll('.bottom-view').forEach(view => {
             view.style.display = 'none';
         });
-        // 顯示目標視圖
         document.getElementById(viewId).style.display = 'flex';
         
-        // 更新按鈕顏色
         document.querySelectorAll('.bottom-nav-item').forEach(item => {
             item.classList.remove('active');
         });
@@ -310,14 +752,11 @@
     function generateLinePack(btnElement) {
         const card = btnElement.closest('.card');
         
-        // 抓取標籤與標題文字，並清理格式
         let rawTitle = card.querySelector('.card-title').innerText;
-        let cleanTitle = rawTitle.replace(/\n/g, ' ').trim(); // 把換行清掉變成 "維度 1 企業大老闆"
+        let cleanTitle = rawTitle.replace(/\n/g, ' ').trim();
 
-        // 開始組合要發送的文案
         let content = `🔥 【遠銀戰神專屬攻略】\n🎯 鎖定：${cleanTitle}\n\n`;
         
-        // 抓取四層話術
         const layers = card.querySelectorAll('.layer');
         layers.forEach(layer => {
             content += layer.innerText + '\n\n';
@@ -325,10 +764,8 @@
 
         content += `快點擊專屬連結或直接與我聯繫！🚀`;
 
-        // 將文案塞入「圖文包庫」的 textarea 中
         document.getElementById('promo-textarea').value = content;
-
-        // 自動切換到底部選單的「圖文包庫」頁面
+        // 自動跳轉到圖文包庫
         switchBottomTab('promo-view', document.getElementById('nav-promo'));
     }
 
@@ -340,14 +777,11 @@
             return;
         }
 
-        // 複製到剪貼簿
         navigator.clipboard.writeText(text).then(() => {
             alert('✅ 複製成功！即將自動開啟 LINE 讓您選擇好友分享。');
-            // 開啟 LINE URL Scheme
             const encodedText = encodeURIComponent(text);
             window.open(`https://line.me/R/msg/text/?${encodedText}`, '_blank');
         }).catch(err => {
-            // 如果瀏覽器不支援 clipboard API，提供 fallback 提示
             alert('⚠️ 無法自動複製，請手動全選文字並複製後分享。');
         });
     }
